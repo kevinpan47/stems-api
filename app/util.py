@@ -9,8 +9,13 @@ from demucs import separate
 from fastapi import UploadFile
 from google.cloud import storage
 
-credentials_json_file = os.path.join(os.getcwd(), './service-account-key.json')
-client = storage.Client.from_service_account_json(credentials_json_file)
+environment = os.getenv('ENVIRONMENT', 'dev')
+
+client = storage.Client()
+if environment == 'dev':
+    credentials_json_file = os.path.join(os.getcwd(), './service-account-key.json')
+    client = storage.Client.from_service_account_json(credentials_json_file)
+
 bucket = client.get_bucket('stems-split')
 
 
@@ -44,13 +49,13 @@ def sanitize_filename(filename: str):
 
 
 def separate_and_upload(checksum: str, src_file_name: str, src_file_path: str):
+    blob = bucket.blob(f'{checksum}/{src_file_name}')
+    blob.upload_from_filename(src_file_path)
+
     try:
         separate.main(["--mp3", "-d", "cpu", src_file_path])
     except:
         print('could not process file')
-    
-    blob = bucket.blob(f'{checksum}/{src_file_name}')
-    blob.upload_from_filename(src_file_path)
 
     for filename in os.scandir(os.path.join(os.getcwd(), 'separated', 'htdemucs', os.path.splitext(os.path.basename(src_file_path))[0])):
         if filename.is_file():

@@ -1,5 +1,6 @@
 FROM debian:11.7-slim
 
+ENV ENVIRONMENT=dev
 RUN apt update
 RUN apt install python3 soundstretch python3-pip git ffmpeg -y
 
