@@ -70,8 +70,8 @@ def separate_and_upload(checksum: str, src_file_name: str, src_file_path: str):
 
 def get_folder_details(id: str):
     details = {'id': id}
-
-    blobs = client.list_blobs('stems-split', prefix=id, delimiter='/')
+    
+    blobs = client.list_blobs('stems-split', prefix=f'{id}/', delimiter='/')
     for blob in blobs:
         url = blob.generate_signed_url(
             version="v4",
