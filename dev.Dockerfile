@@ -11,6 +11,8 @@ COPY ./service-account-key.json /src/service-account-key.json
 
 RUN pip install --no-cache-dir --upgrade -r /src/requirements.txt
 
+RUN python3 -m demucs --mp3 -d cpu test.mp3
+
 COPY ./app /src/app
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
