@@ -10,7 +10,10 @@ COPY ./requirements.txt /src/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r /src/requirements.txt
 
+COPY ./test.mp3 /src/test.mp3
 RUN python3 -m demucs --mp3 -d cpu test.mp3
+RUN rm -rf /src/separated/htdemucs/test/
+RUN rm test.mp3
 
 COPY ./app /src/app
 
