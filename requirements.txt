@@ -9,3 +9,4 @@ ffmpeg
 demucs @ git+https://github.com/facebookresearch/demucs#egg=demucs
 websockets
 google-cloud-storage
+yt-dlp

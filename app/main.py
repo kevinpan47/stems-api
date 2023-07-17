@@ -1,9 +1,10 @@
 import os
 import re
 import shutil
-from fastapi import BackgroundTasks, FastAPI, HTTPException, UploadFile, WebSocket
-
+from fastapi import BackgroundTasks, FastAPI, HTTPException, UploadFile
+import yt_dlp
 from app import util
+from fastapi.responses import FileResponse
 
 ACCEPTED_FILE_TYPES = ['audio/aiff', 'audio/mpeg', 'audio/wav', 'audio/vnd.dlna.adts', 'audio/ogg']
 app = FastAPI()
@@ -34,6 +35,25 @@ async def separate_audio(file: UploadFile, background_tasks: BackgroundTasks):
 
     return checksum
     
+
+@app.get("/ytdl")
+async def download_youtube(url: str):
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }],
+        'paths': {
+            'home': './ytdl'
+        }
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url)
+        filename = os.path.splitext(ydl.prepare_filename(info))[0]
+    
+    return FileResponse(f"{filename}.mp3")
 
 @app.get("/info")
 async def get_info(id: str):
